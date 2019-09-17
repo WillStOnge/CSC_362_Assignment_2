@@ -1,17 +1,52 @@
+/*
+	Author: Will St. Onge
+	
+	Filename: main.c
+
+	Description: Main file for program. Initializes variables, loops through file, and calls other functions
+*/
+
+#define FILENAME "football2.txt"
+
 #include "main.h"
 
-int main()
+// Entry point
+main()
 {
-	int predictor1 = 0, predictor2 = 0, predictor3 = 0, predictor4 = 0, predictor5 = 0;
-	char home_team[20] = "", visiting_team[20] = "";
-	int HTO = 0, HTD = 0, HTS = 0, HTH = 0, HTC = 0, VTO = 0, VTD = 0, VTS = 0, VTR = 0;
-	FILE *file;
+	char home_team[20] = "", visiting_team[20] = ""; // Team names
+	int HTO, HTD, HTS, HTH, HTC, VTO, VTD, VTS, VTR; // Home and visitor variables
+	int home_wins = 0, total_games = 0; // Win count
+	FILE* file; // File pointer
+	double predictor1, predictor2, predictor3, predictor4, predictor5, difference; // More vars for calculation
 
-	fopen_s(&file, "football1.txt", "r");
-	
-	input(file, home_team, &HTO, &HTD, &HTS, &HTH, &HTC, visiting_team, &VTO, &VTD, &VTS, &VTR);
+	// Open file with read only
+	fopen_s(&file, FILENAME, "r");
 
-	printf("%s", home_team);
-	
-	return 0;
+	// Go through each line of the file and do applicable operations on the input
+	while (!feof(file))
+	{
+		// Get input values from the file pointer
+		input(file, home_team, &HTO, &HTD, &HTS, &HTH, &HTC, visiting_team, &VTO, &VTD, &VTS, &VTR);
+
+		// Compute numbers
+		compute(HTO, HTD, HTS, HTH, HTC, VTO, VTD, VTS, VTR, &predictor1, &predictor2, &predictor3, &predictor4, &predictor5);
+
+		// Calculate a score
+		score(predictor1, predictor2, predictor3, predictor4, predictor5, &difference);
+
+		// Update home win percentage
+		update((int)difference, &home_wins);
+
+		// Output results to console
+		output(home_team, visiting_team, (int)difference);
+
+		// Incremenet game count
+		total_games+=1;
+	}
+
+	// Output program summary to console
+	summary(home_wins, total_games);
+
+	// Close the file
+	fclose(file);
 }
